@@ -1,0 +1,43 @@
+Tokenblauser PCB v.1.1 changes.
+
+Main board:
+
+1) Not installed:
+
+- C1, C24, C25, C29, C50, C51, C58, C59, C60, C61, C64, C70, C76, C77, C90, C91, C96, C97, C100, C102, C103, C104, C105
+- D4, D5, D6, D7
+- J5, J6
+- L10, L12, L15, L16
+- R3, R4, R5, R6, R16, R17, R18, R19, R20, R28, R40, R48, R50, R62, R63, R65, R70, R72, R66, R74, R78, R80
+- SW1
+- U12, U15, U22
+- Y2
+
+2) Add elements:
+
+- ceramic capacitor 0.1uF near the Uin (3) pin of the OCXO
+- C89 - 1nF 0603
+- R15 - 100R 0603
+
+
+3) Replacements:
+
+- U5, U7, U9, U13, U18 - NCP115ASN330T2G		
+- U19 - LT1761ES5-3.3
+- D3 - L-115WEGW
+- U16, U17 - SN74LV1T04DBVR
+- F1 - PTC RESET FUSE 1.5A 1206 0ZCJ0150FF2C
+- L5 - CMC 370MA 2LN 90 OHM SMD DPWC1206-900
+
+
+Sub board:
+
+1) Not installed: 
+
+- S3
+
+2) Replacements:
+
+- S1,S2,S4 - Microswitch TACT h=6mm 
+- U1 - OLED 128x32 0.91"
+
