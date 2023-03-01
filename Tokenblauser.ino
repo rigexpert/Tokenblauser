@@ -40,7 +40,8 @@
 // PCB version
 
 //#define DEVICE_REVISION 9 // Initial breakout 0.9
-#define DEVICE_REVISION 10 // First prototype 1.0
+//#define DEVICE_REVISION 10 // First prototype 1.0
+#define DEVICE_REVISION 11 // Production 1.1
 
 // Firmware version
 
@@ -124,11 +125,15 @@ int loop_damping_thousands = 3000;
 const int loop_damping_thousands_constants[] = {500, 750, 1000, 2000, 3000, 5000, 7500, 10000 };
 
 int tuning_range_ppt = // OCXO tuning range in ppt
-#if DEVICE_REVISION>=10
-  481000 
+#if DEVICE_REVISION>=11
+    674000 
 #else
-  847000
-#endif
+  #if DEVICE_REVISION>=10
+    481000 
+  #else
+    847000
+  #endif
+#endif  
 ;
 
 // Lock mode and indication
@@ -1026,21 +1031,19 @@ void update_all_fqs_from_all_stores()
 #define LOS_MASK 0x04
 #define LOCK_MASK 0x15
 
-#if DEVICE_REVISION>=10
-  #define  SI_ADDR      0x70
-#else  
-  #define  SI_ADDR      0x71
-#endif
-  
 #define SYNTH_SDA 11 // PA16
 #define SYNTH_SCL 13 // PA17
 
-
 TwoWire synthWire(&sercom1, SYNTH_SDA, SYNTH_SCL); // PA16, PA17
+
+#define SI_ADDR_DEFAULT 0x70
+#define SI_ADDR_ALTERNATIVE 0x71
+
+uint8_t si_addr = SI_ADDR_DEFAULT;
 
 void synth_byte_write(uint8_t addr, uint8_t data)
 {
-  synthWire.beginTransmission(SI_ADDR);
+  synthWire.beginTransmission(si_addr);
   synthWire.write(addr);
   synthWire.write(data);
   synthWire.endTransmission();
@@ -1048,10 +1051,10 @@ void synth_byte_write(uint8_t addr, uint8_t data)
 
 uint8_t synth_byte_read(uint8_t addr)
 {
-  synthWire.beginTransmission(SI_ADDR);
+  synthWire.beginTransmission(si_addr);
   synthWire.write(addr);
   synthWire.endTransmission();
-  synthWire.requestFrom(SI_ADDR, 1);
+  synthWire.requestFrom(si_addr, 1);
 
   uint8_t data = synthWire.read();
   return data;
@@ -1070,6 +1073,13 @@ void init_synth()
   synthWire.setClock(400000); // Fast mode
   pinPeripheral (SYNTH_SDA, PIO_SERCOM); // Peripheral C 
   pinPeripheral (SYNTH_SCL, PIO_SERCOM); // Peripheral C
+
+  // Probe for an alternative I2C address
+
+  synthWire.beginTransmission(SI_ADDR_ALTERNATIVE);
+  byte err = synthWire.endTransmission();
+  if (err==0)
+    si_addr = SI_ADDR_ALTERNATIVE;
 
 
   // Get the SI5338 grade
@@ -1106,7 +1116,7 @@ void init_synth()
     case 'J':
     case 'M':
     case 'Q':
-      si_max_fq = 350; 
+      si_max_fq = 200; 
       break;
 
     default:
@@ -1880,14 +1890,20 @@ void init_flash(boolean need_reset = false)
 
 // Buttons
 
-#if DEVICE_REVISION>=10
-  #define BUTTON_MENU A4 // MCU PA05
-  #define BUTTON_RIGHT A3 // MCU PA04
-  #define BUTTON_LEFT A2 // MCU PB09
+#if DEVICE_REVISION>=11
+    #define BUTTON_MENU A4 // MCU PA05
+    #define BUTTON_RIGHT A2 // MCU PB09
+    #define BUTTON_LEFT A1 // MCU PB08
 #else
-  #define BUTTON_MENU A1 // MCU PB08
-  #define BUTTON_RIGHT A2 // MCU PB09
-  #define BUTTON_LEFT A3 // MCU PA04
+  #if DEVICE_REVISION>=10
+    #define BUTTON_MENU A4 // MCU PA05
+    #define BUTTON_RIGHT A3 // MCU PA04
+    #define BUTTON_LEFT A2 // MCU PB09
+  #else
+    #define BUTTON_MENU A1 // MCU PB08
+    #define BUTTON_RIGHT A2 // MCU PB09
+    #define BUTTON_LEFT A3 // MCU PA04
+  #endif
 #endif
 
 void init_buttons()
