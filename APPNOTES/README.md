@@ -9,5 +9,6 @@ TBR-AN-3: Description of the schematic diagram and DIY hardware modifications
 TBR-AN-5: What’s wrong with the QO-100 WebSDRs?
 
 TBR-AN-6: Frequency stability measurement using a satellite beacon at 11.703505 GHz, GNU Radio and TimeLab
+tbr-an-6-01.grc - GRC fole for this application note.
 
 TBR-AN-7: A GSDO as an external 28.8 MHz reference clock for RTL-SDR
